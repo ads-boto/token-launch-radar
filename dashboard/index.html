@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token Radar — pre-token protocols ranked by implied launch value</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="sweep" aria-hidden="true"></div>
+
+<header class="top">
+  <div class="brand">
+    <div class="mark" aria-hidden="true"><i></i></div>
+    <div class="brandtext">
+      <h1>TOKEN RADAR</h1>
+      <p>Pre-token protocols, ranked by implied launch value</p>
+    </div>
+  </div>
+  <div class="snapshot" id="snapshot"></div>
+</header>
+
+<section class="stats" id="stats" aria-label="Snapshot summary"></section>
+
+<nav class="tabs" id="tabs" aria-label="Views">
+  <button type="button" data-tab="radar" class="on">Launch radar</button>
+  <button type="button" data-tab="market">Live tokens</button>
+  <button type="button" data-tab="method">Method</button>
+  <div class="tabspacer"></div>
+  <span class="legend"><b class="dot low"></b>low risk <b class="dot medium"></b>medium <b class="dot high"></b>high</span>
+</nav>
+
+<main>
+  <section id="panel-radar" class="panel">
+    <div class="toolbar">
+      <label class="search">
+        <span class="ico" aria-hidden="true"></span>
+        <input id="q" type="search" placeholder="Search a protocol, slug or sector" autocomplete="off">
+      </label>
+      <label class="field"><span>Sector</span><select id="sector"></select></label>
+      <label class="field"><span>Chain</span><select id="chain"></select></label>
+      <label class="field"><span>Size</span><select id="size">
+        <option value="all">All sizes</option>
+        <option value="1e9">TVL $1B+</option>
+        <option value="2.5e8">TVL $250M+</option>
+        <option value="5e7">TVL $50M+</option>
+        <option value="1e7">TVL $10M+</option>
+      </select></label>
+      <label class="field"><span>Sort</span><select id="sort">
+        <option value="implied">Implied value</option>
+        <option value="signal">Signal</option>
+        <option value="tvl">TVL</option>
+        <option value="growth">7-day change</option>
+        <option value="age">Age without token</option>
+        <option value="name">Name</option>
+      </select></label>
+      <button type="button" id="reset" class="reset">Reset</button>
+    </div>
+
+    <div class="filterline" id="filterline"></div>
+
+    <div class="tablewrap">
+      <table class="board">
+        <thead>
+          <tr>
+            <th class="num">#</th>
+            <th>Protocol</th>
+            <th>Sector</th>
+            <th>Chains</th>
+            <th class="num">TVL</th>
+            <th class="num">7d</th>
+            <th class="num">Age</th>
+            <th class="signalcol">Signal</th>
+            <th class="num value">Implied value</th>
+            <th class="riskcol">Risk</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <p class="empty" id="empty" hidden>No protocol matches these filters. Widen the search or reset the view.</p>
+    </div>
+    <p class="footnote" id="footnote"></p>
+  </section>
+
+  <section id="panel-market" class="panel" hidden>
+    <div class="panelhead">
+      <h2>Live tokens</h2>
+      <p>Protocols whose token already trades. They are kept out of the launch board and shown at the market's own value.</p>
+    </div>
+    <div class="tablewrap">
+      <table class="board">
+        <thead>
+          <tr>
+            <th class="num">#</th>
+            <th>Protocol</th>
+            <th>Sector</th>
+            <th>Chains</th>
+            <th class="num">Market cap</th>
+            <th class="num">TVL</th>
+            <th class="num">MC / TVL</th>
+            <th class="num">7d</th>
+          </tr>
+        </thead>
+        <tbody id="liverows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="panel-method" class="panel" hidden>
+    <div class="panelhead">
+      <h2>How the radar values a launch</h2>
+      <p id="methodlede"></p>
+    </div>
+    <div class="method">
+      <article class="card">
+        <h3>One model, every row</h3>
+        <p>The implied value is a sector multiple of TVL, moved by the protocol's seven-day growth, how long it has run without a recorded token, and how many chains it reaches. No protocol is named in the arithmetic; the same four functions score a $20M launch candidate and a $2.7B one.</p>
+        <pre id="formula"></pre>
+      </article>
+      <article class="card">
+        <h3>Constants</h3>
+        <p>The whole of the model's opinion sits in these numbers, printed beside the values they produce.</p>
+        <div id="constants" class="kv"></div>
+      </article>
+      <article class="card">
+        <h3>Sector multiples</h3>
+        <p>FDV / TVL benchmarks by DefiLlama sector, the only name-dependent input, and it is a sector, never a protocol.</p>
+        <div id="sectors" class="barrows"></div>
+      </article>
+      <article class="card">
+        <h3>What this is not</h3>
+        <p>It is not a forecast that a token launches, nor a price target: the snapshot records no supply, so the value is an FDV estimate in dollars. A protocol may run for years and never issue a token. The farm plans describe activity that may earn a future allocation; they are not investment advice and the capital can be lost.</p>
+      </article>
+    </div>
+  </section>
+</main>
+
+<aside id="drawer" class="drawer" hidden aria-label="Protocol detail"></aside>
+<div id="scrim" class="scrim" hidden></div>
+
+<footer class="foot">
+  <span>Token Radar · <span id="footsnap"></span></span>
+  <span>Built by an AI agent for make.fun's token-radar-01 bounty</span>
+</footer>
+
+<script src="../data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
