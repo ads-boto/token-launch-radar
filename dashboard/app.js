@@ -184,18 +184,36 @@
 
   function renderFilterLine(shown) {
     var chips = [];
-    if (state.q.trim()) chips.push('search: ' + state.q.trim());
-    if (state.sector !== 'all') chips.push('sector: ' + state.sector);
-    if (state.chain !== 'all') chips.push('chain: ' + state.chain);
-    if (state.size !== 'all') chips.push('TVL ≥ ' + compact(Number(state.size)));
-    if (state.sort !== 'implied') chips.push('sorted by ' + document.getElementById('sort').selectedOptions[0].textContent.toLowerCase());
+    if (state.q.trim()) chips.push({ key: 'q', label: 'search: ' + state.q.trim() });
+    if (state.sector !== 'all') chips.push({ key: 'sector', label: 'sector: ' + state.sector });
+    if (state.chain !== 'all') chips.push({ key: 'chain', label: 'chain: ' + state.chain });
+    if (state.size !== 'all') chips.push({ key: 'size', label: 'TVL ≥ ' + compact(Number(state.size)) });
+    if (state.sort !== 'implied') chips.push({ key: 'sort', label: 'sorted by ' + document.getElementById('sort').selectedOptions[0].textContent.toLowerCase() });
     var line = document.getElementById('filterline');
     if (chips.length === 0) {
       line.innerHTML = '';
       return;
     }
-    line.innerHTML = chips.map(function (chip) { return '<span class="chip">' + esc(chip) + '</span>'; }).join('') +
+    // Each chip is its own undo: the × drops that one filter and leaves the rest of the view alone.
+    line.innerHTML = chips.map(function (chip) {
+      return '<button type="button" class="chip" data-clear="' + chip.key + '" title="Remove this filter">' +
+        esc(chip.label) + ' <b aria-hidden="true">×</b></button>';
+    }).join('') +
       '<span class="count">' + shown + ' of ' + ROWS.length + ' rows</span>';
+  }
+
+  /** Drop one filter, sync the toolbar controls to it, and repaint. */
+  function clearFilter(key) {
+    if (key === 'sort') state.sort = 'implied';
+    else if (key === 'size') state.size = 'all';
+    else state[key] = 'all';
+    if (key === 'q') {
+      state.q = '';
+      document.getElementById('q').value = '';
+    }
+    var control = document.getElementById(key);
+    if (control) control.value = state[key];
+    renderBoard();
   }
 
   function renderBoard() {
@@ -406,6 +424,10 @@
       size.value = 'all';
       sort.value = 'implied';
       renderBoard();
+    });
+    document.getElementById('filterline').addEventListener('click', function (event) {
+      var button = event.target.closest('button[data-clear]');
+      if (button) clearFilter(button.getAttribute('data-clear'));
     });
   }
 
